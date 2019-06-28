@@ -2,25 +2,28 @@ import React, { Component } from 'react'
 import Styles from './styles'
 
 import {
-	Platform, ListView, StyleSheet, StatusBar, TouchableHighlight,
+	Platform, StyleSheet, StatusBar, TouchableHighlight,
 	View,
 	Text,
+	FlatList,
+	ListView,
 } from 'react-native';
 import PropTypes from 'prop-types';
 
 class WatchFace1 extends Component {
-	static propTypes = {
-		sectionTime: PropTypes.string,
-		totalTime: PropTypes.string,
-	}
 	render() {
 		return (
 			<View style={Styles.watchFaceContainer}>
-				<Text style={Styles.sectionTime}>{this.propTypes.sectionTime}</Text>
-				<Text style={Styles.totalTime}>{this.propTypes.totalTime}</Text>
+				<Text style={Styles.sectionTime}>{this.props.sectionTime}</Text>
+				<Text style={Styles.totalTime}>{this.props.totalTime}</Text>
 			</View>
 		)
 	}
+}
+
+WatchFace1.propTypes = {
+	sectionTime: PropTypes.string,
+	totalTime: PropTypes.string,
 }
 
 class WatchControl extends Component {
@@ -38,7 +41,7 @@ class WatchControl extends Component {
 			startBtnText: '启动',
 			startBtnColor: '#60B644',
 			stopBtnText: "计次",
-			underlayColor: "#fff",
+			undesrlayColor: "#fff",
 		}
 	}
 
@@ -94,9 +97,10 @@ class WatchControl extends Component {
 }
 
 class WatchRecord extends Component {
+
 	static propTypes = {
 		record: PropTypes.array,
-	};
+	}
 
 	render() {
 		let ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 }),
@@ -106,16 +110,14 @@ class WatchRecord extends Component {
 			<ListView
 				style={Styles.recordList}
 				dataSource={theDataSource}
-				renderRow= {(rowData) =>
+				renderRow={(rowData) =>
 					<View style={Styles.recordItem}>
 						<Text style={Styles.recordItemTitle}>{rowData.title}</Text>
 						<View style={{ alignItems: "center" }}>
 							<Text style={Styles.recordItemTime}>{rowData.time}</Text>
 						</View>
-					</View>
-				}
-			/>
-		)
+					</View>} />
+		);
 	}
 }
 
@@ -175,7 +177,7 @@ class WatchFace extends Component {
 				this.setState({
 					currentTime: (new Date()).getTime()
 				})
-				countingTime = this.state.timeAccumulation + this.state.currentTime - this.state.initialTime;
+				countingTime = this.state.timeAccumulation + this.state.currentTime - this.state.intialTime;
 				minute = Math.floor(countingTime / (60 * 1000));
 				second = Math.floor((countingTime - 6000 * minute) / 1000);
 				milSecond = Math.floor((countingTime % 1000) / 10);
@@ -210,13 +212,10 @@ class WatchFace extends Component {
 		}
 		record.unshift({ title: "计次" + recordCounter, time: this.state.sectionTime });
 		this.setState({
-			recordTime: this.state.timeAccumulation + this.state.currentTime - this.state.initialTime,
+			recordTime: this.state.timeAccumulation + this.state.currentTime - this.state.intialTime,
 			recordCounter: recordCounter,
 			record: record
 		})
-		//use refs to call functions within other sub component
-		//can force to update the states
-		// this.refs.record._updateData();
 	}
 
 	_clearRecord() {
